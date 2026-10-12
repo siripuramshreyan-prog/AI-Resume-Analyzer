@@ -101,3 +101,91 @@ test('analysis provides clear score explanations for each category', () => {
     assert.match(result.explanations[cat], /\d+%/);
   }
 });
+
+test('company names are excluded from missing keywords and term extraction', () => {
+  const companySentence = 'Acme Corp is hiring at Google, Microsoft, Amazon, Meta, and Netflix headquarters.';
+  const terms = analyzer.extractTerms(companySentence);
+  for (const company of ['acme', 'corp', 'google', 'microsoft', 'amazon', 'meta', 'netflix']) {
+    assert.ok(!terms.includes(company), `extractTerms should exclude company name: ${company}`);
+  }
+
+  const resume = 'Summary: Python developer. Skills: Python, SQL, React. Projects: Built web application for 100 users. Education: Computer Science. Experience: Developed APIs and tested code. Certifications: Git.';
+  const jdWithCompanies = 'Acme Corp and Google are seeking candidates with Python, Docker, Kubernetes, and Cloud. Our team at Microsoft partner solutions welcomes applicants.';
+  const result = analyzer.analyze(resume, jdWithCompanies);
+
+  for (const company of ['acme', 'corp', 'google', 'microsoft']) {
+    assert.ok(!result.missingKeywords.includes(company), `missingKeywords must not include company name: ${company}`);
+    assert.ok(!result.matchedKeywords.includes(company), `matchedKeywords must not include company name: ${company}`);
+  }
+  assert.ok(result.missingKeywords.includes('docker') || result.missingKeywords.includes('kubernetes'), 'should still capture actual missing skills');
+});
+
+test('generic hiring words and HR boilerplate are excluded from missing keywords and term extraction', () => {
+  const boilerplate = 'Competitive salary, 401k benefits, health insurance, visa sponsorship, bachelor degree or master degree required for full-time remote role.';
+  const terms = analyzer.extractTerms(boilerplate);
+  for (const word of ['salary', 'benefits', 'insurance', 'visa', 'sponsorship', 'bachelor', 'degree', 'master', 'fulltime', 'remote']) {
+    assert.ok(!terms.includes(word), `extractTerms should exclude generic hiring word: ${word}`);
+  }
+
+  const resume = 'Summary: Python developer. Skills: Python, SQL, React. Projects: Built web application for 100 users. Education: Computer Science. Experience: Developed APIs and tested code. Certifications: Git.';
+  const jdWithBoilerplate = 'We offer competitive salary, health benefits, insurance, and visa sponsorship. Candidate must have a bachelor degree or master degree. Required skills: Python, Docker, and Kubernetes.';
+  const result = analyzer.analyze(resume, jdWithBoilerplate);
+
+  for (const word of ['salary', 'benefits', 'insurance', 'visa', 'sponsorship', 'bachelor', 'degree', 'master']) {
+    assert.ok(!result.missingKeywords.includes(word), `missingKeywords must not include generic hiring word: ${word}`);
+  }
+  assert.ok(result.missingKeywords.includes('docker') || result.missingKeywords.includes('kubernetes'), 'should still include actual technical skills');
+});
+
+test('keyword score calculation is mathematically validated across boundaries', () => {
+  // Test 0% match: Resume has completely disjoint skills from JD
+  const resumeNoMatch = 'Summary: Ruby developer. Skills: Ruby, Rails, Heroku. Projects: Built legacy system for 10 users. Education: Computer Science. Experience: Maintained databases and code. Certifications: Linux.';
+  const jdTech = 'We require a Python engineer with Docker, Kubernetes, AWS, and TypeScript expertise for cloud platform infrastructure.';
+  const resultZero = analyzer.analyze(resumeNoMatch, jdTech);
+  assert.equal(resultZero.keywordsScore, 0, 'keywordsScore should be 0% when zero keywords match');
+  assert.equal(resultZero.matchedKeywords.length, 0, 'matchedKeywords should be empty when zero keywords match');
+  assert.ok(resultZero.missingKeywords.length > 0, 'missingKeywords should contain JD requirements');
+
+  // Test 100% match: Resume contains all relevant keywords in JD
+  const resumeFullMatch = 'Summary: Python and Docker developer. Skills: Python, Docker, Kubernetes, AWS, TypeScript, cloud, platform, infrastructure. Projects: Built cloud platform systems for 500 users. Education: Computer Science. Experience: Deployed Kubernetes clusters and AWS infrastructure. Certifications: AWS.';
+  const jdTechMatching = 'We require an experienced Python developer with Docker, Kubernetes, and AWS expertise for cloud platform infrastructure.';
+  const resultFull = analyzer.analyze(resumeFullMatch, jdTechMatching);
+  assert.equal(resultFull.keywordsScore, 100, 'keywordsScore should be 100% when all relevant keywords match');
+  assert.equal(resultFull.missingKeywords.length, 0, 'missingKeywords should be empty when all keywords match');
+
+  // Test ratio precision and non-inflation with corporate and HR noise
+  const resumePartial = 'Summary: Python engineer with Docker. Skills: Python, Docker. Projects: Built containerized tools for 40 users. Education: Computer Science. Experience: Developed microservices and tested code. Certifications: Git.';
+  const jdClean = 'Seeking an experienced engineer with skills in Python, Docker, Kubernetes, and AWS for cloud platform services.';
+  const resultClean = analyzer.analyze(resumePartial, jdClean);
+
+  const jdWithJunk = 'Google and Acme Corp offer competitive salary, health insurance, 401k benefits, visa sponsorship, bachelor degree. Seeking an experienced engineer with skills in Python, Docker, Kubernetes, and AWS for cloud platform services.';
+  const resultWithJunk = analyzer.analyze(resumePartial, jdWithJunk);
+
+  // Both should have identical technical keyword score because noise is excluded
+  assert.equal(resultClean.keywordsScore, resultWithJunk.keywordsScore, 'keywordsScore should not be deflated by company names or HR boilerplate');
+  assert.ok(resultWithJunk.keywordsScore >= 0 && resultWithJunk.keywordsScore <= 100, 'keywordsScore must be bounded between 0 and 100');
+});
+
+test('isExcludedTerm helper correctly filters noise while preserving valid technical tokens', () => {
+  // Excluded entities
+  assert.ok(analyzer.isExcludedTerm('google'));
+  assert.ok(analyzer.isExcludedTerm('microsoft'));
+  assert.ok(analyzer.isExcludedTerm('acme'));
+  assert.ok(analyzer.isExcludedTerm('salary'));
+  assert.ok(analyzer.isExcludedTerm('benefits'));
+  assert.ok(analyzer.isExcludedTerm('visa'));
+  assert.ok(analyzer.isExcludedTerm('sponsorship'));
+  assert.ok(analyzer.isExcludedTerm('bachelor'));
+  assert.ok(analyzer.isExcludedTerm('degree'));
+  assert.ok(analyzer.isExcludedTerm('full-time'));
+
+  // Valid technical terms preserved
+  assert.ok(!analyzer.isExcludedTerm('python'));
+  assert.ok(!analyzer.isExcludedTerm('react'));
+  assert.ok(!analyzer.isExcludedTerm('docker'));
+  assert.ok(!analyzer.isExcludedTerm('kubernetes'));
+  assert.ok(!analyzer.isExcludedTerm('c++'));
+  assert.ok(!analyzer.isExcludedTerm('node.js'));
+  assert.ok(!analyzer.isExcludedTerm('ci/cd'));
+});
+

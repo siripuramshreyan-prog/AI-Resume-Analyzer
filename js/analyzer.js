@@ -24,7 +24,58 @@
     'responsibility','responsibilities','responsible',
     'qualification','qualifications','qualified',
     'hire','hiring','hired','help','helping',
-    'ideal','must','able','duties','overview','description'
+    'ideal','must','able','duties','overview','description',
+    'skill','skills','offer','offers','offering','offered',
+    'provide','provides','providing','provided',
+    'include','includes','including','plus'
+  ]);
+
+  const COMPANY_NAMES = new Set([
+    // Leading technology and enterprise companies
+    'google','microsoft','amazon','apple','meta','netflix','uber','airbnb',
+    'infosys','tcs','wipro','accenture','deloitte','cognizant','ibm','oracle',
+    'intel','cisco','salesforce','adobe','flipkart','swiggy','zomato','stripe',
+    'spotify','slack','zoom','twitter','linkedin','github','gitlab','paypal',
+    'walmart','target','jpmorgan','goldman','bloomberg','acme','tesla','nvidia',
+    'samsung','capgemini','hcl','qualcomm','broadcom','vmware','servicenow',
+    'snowflake','databricks','palantir','atlassian','lyft','snap','pinterest',
+    'reddit','ebay','shopify','bytedance','tiktok','intuit','square','block',
+    // Corporate entity indicators and company suffixes
+    'inc','incorporated','corp','corporation','ltd','limited','llc','gmbh',
+    'technologies','solutions','enterprises','holdings','group','services',
+    'consulting','systems','ventures','pvt','private'
+  ]);
+
+  const GENERIC_HIRING_WORDS = new Set([
+    // Compensation, perks and benefits
+    'salary','salaries','compensation','benefit','benefits','perk','perks',
+    'bonus','bonuses','equity','stipend','stipends','insurance','health',
+    'dental','vision','vacation','pto','package','competitive','remuneration',
+    'allowance','allowances','pension','wellness','401k','relocation',
+    // Education, academic credentials and degrees
+    'bachelor','bachelors','master','masters','degree','degrees','phd',
+    'doctorate','diploma','graduate','graduates','undergraduate','undergraduates',
+    'fresher','freshers','student','students','university','college','school',
+    'academic','education','gpa','alumni',
+    // Generic capability and requirement filler
+    'expertise','proficient','proficiency','knowledge','skilled','strong',
+    'demonstrated','proven','competency','competencies','ability','abilities',
+    // Employment terms, arrangement and location types
+    'fulltime','parttime','contract','contractor','contractors','temporary',
+    'permanent','remote','hybrid','onsite','office','location','locations',
+    'commute','travel','shift','shifts','hourly','annual','annually',
+    // Legal, visa, sponsorship and compliance
+    'visa','sponsorship','citizenship','authorization','authorized','residency',
+    'eligible','eligibility','clearance','background','equal','opportunity',
+    'employer','eeo','affirmative','diversity','inclusion','disability',
+    'veteran','veterans','gender','race','religion','creed','accommodation',
+    'accommodations','compliance','lawful',
+    // Hiring process, recruitment and application
+    'interview','interviews','recruiter','recruiting','recruitment','screening',
+    'applied','applicant','applicants','application','applications','apply','applying',
+    'resume','resumes','cover','letter','portfolio','references','referral','referrals',
+    'notice','period','immediate','join','joining','joins','opening','openings',
+    'career','careers','hire','hiring','hired','seeking','seeks','candidate','candidates'
   ]);
 
   const SKILL_TERMS = [
@@ -37,12 +88,24 @@
     'nosql','terraform','problem solving','collaboration'
   ];
 
+  function isExcludedTerm(term) {
+    if (!term || typeof term !== 'string') return true;
+    const clean = term.toLowerCase().replace(/^[.+#-]+|[.#-]+$/g, '');
+    const stripped = clean.replace(/[-.]/g, '');
+    return STOP_WORDS.has(clean) ||
+           STOP_WORDS.has(stripped) ||
+           COMPANY_NAMES.has(clean) ||
+           COMPANY_NAMES.has(stripped) ||
+           GENERIC_HIRING_WORDS.has(clean) ||
+           GENERIC_HIRING_WORDS.has(stripped);
+  }
+
   function extractTerms(text) {
     return [...new Set((String(text).toLowerCase().match(/[a-z][a-z0-9+#.-]{1,}/g) || [])
       .map(term => (term === 'c++' || term.startsWith('c++'))
         ? term.replace(/^[.+#-]+|[.#-]+$/g, '')
         : term.replace(/^[.+#-]+|[.+#-]+$/g, ''))
-      .filter(term => term.length > 2 && !STOP_WORDS.has(term)))];
+      .filter(term => term.length > 2 && !isExcludedTerm(term)))];
   }
 
   function escapeHtml(value) {
@@ -52,7 +115,12 @@
   }
 
   function isSkillTerm(term) {
-    return SKILL_TERMS.some(s => s === term || s.includes(term) || term.includes(s));
+    return SKILL_TERMS.some(s => {
+      if (s === term) return true;
+      if (s.length > 2 && term.includes(s)) return true;
+      if (term.length > 3 && s.includes(term)) return true;
+      return false;
+    });
   }
 
   function analyze(resume, jobDescription) {
@@ -65,8 +133,8 @@
     const resumeLower = resumeText.toLowerCase();
     const jdLower = jdText.toLowerCase();
 
-    // Extract terms from JD and resume
-    const jdExtracted = extractTerms(jdText).filter(term => term.length > 3 || term === 'c++');
+    // Extract terms from JD and resume (filtering out excluded words)
+    const jdExtracted = extractTerms(jdText).filter(term => (term.length > 3 || term === 'c++') && !isExcludedTerm(term));
     const resumeTerms = new Set(extractTerms(resumeText));
 
     // Identify target skills mentioned in the job description
@@ -75,36 +143,38 @@
     const missingSkills = jdSkills.filter(skill => !resumeLower.includes(skill));
 
     // Prioritize meaningful skills and requirements over generic terms
-    const jdTerms = [...new Set(jdExtracted)].sort((a, b) => {
-      const aSkill = isSkillTerm(a);
-      const bSkill = isSkillTerm(b);
-      if (aSkill && !bSkill) return -1;
-      if (!aSkill && bSkill) return 1;
-      return 0;
-    });
+    const jdTerms = [...new Set(jdExtracted)]
+      .filter(term => !isExcludedTerm(term))
+      .sort((a, b) => {
+        const aSkill = isSkillTerm(a);
+        const bSkill = isSkillTerm(b);
+        if (aSkill && !bSkill) return -1;
+        if (!aSkill && bSkill) return 1;
+        return 0;
+      });
 
-    const allMatched = jdTerms.filter(term => resumeTerms.has(term));
-    const allMissing = jdTerms.filter(term => !resumeTerms.has(term));
+    const allMatched = jdTerms.filter(term => resumeTerms.has(term) && !isExcludedTerm(term));
+    const allMissing = jdTerms.filter(term => !resumeTerms.has(term) && !isExcludedTerm(term));
     const totalRelevant = jdTerms.length;
 
     // Accurate keyword score directly reflecting matched vs total relevant keywords
     const keywordsScore = totalRelevant > 0
-      ? Math.round((allMatched.length / totalRelevant) * 100)
+      ? Math.max(0, Math.min(100, Math.round((allMatched.length / totalRelevant) * 100)))
       : 0;
 
     const matchedKeywords = allMatched.slice(0, 12);
     const missingKeywords = allMissing.slice(0, 10);
 
     const skillsScore = jdSkills.length
-      ? Math.round((matchedSkills.length / jdSkills.length) * 100)
+      ? Math.max(0, Math.min(100, Math.round((matchedSkills.length / jdSkills.length) * 100)))
       : keywordsScore;
 
     const actionSignals = (resumeText.match(/\b(built|created|delivered|designed|developed|improved|increased|led|reduced|automated|implemented|managed|deployed|tested)\b/gi) || []).length;
-    const experienceScore = Math.min(100, 25 + actionSignals * 8);
+    const experienceScore = Math.max(0, Math.min(100, Math.round(25 + actionSignals * 8)));
     const sections = ['education','skills','projects','experience','summary','certifications'];
     const sectionCount = sections.filter(section => new RegExp('\\b' + section + '\\b', 'i').test(resumeText)).length;
-    const formattingScore = Math.round(sectionCount / sections.length * 100);
-    const overallScore = Math.round(skillsScore * 0.35 + experienceScore * 0.20 + keywordsScore * 0.30 + formattingScore * 0.15);
+    const formattingScore = Math.max(0, Math.min(100, Math.round((sectionCount / sections.length) * 100)));
+    const overallScore = Math.max(0, Math.min(100, Math.round(skillsScore * 0.35 + experienceScore * 0.20 + keywordsScore * 0.30 + formattingScore * 0.15)));
 
     const explanations = {
       overall: `Overall score (${overallScore}%): Weighted combination of skills alignment (35%), keyword coverage (30%), experience fit (20%), and resume formatting (15%).`,
@@ -137,7 +207,17 @@
     };
   }
 
-  const api = Object.freeze({ analyze, extractTerms, escapeHtml, SKILL_TERMS });
+  const api = Object.freeze({
+    analyze,
+    extractTerms,
+    escapeHtml,
+    isSkillTerm,
+    isExcludedTerm,
+    SKILL_TERMS,
+    COMPANY_NAMES,
+    GENERIC_HIRING_WORDS,
+    STOP_WORDS
+  });
   root.ResumeAnalyzer = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -610,11 +610,17 @@ function renderResults(r) {
     document.getElementById('ms-'+k).style.color=scoreColor(v);
   });
 
-  const bars=[{l:'Keywords match',v:r.keywordsScore},{l:'Skills alignment',v:r.skillsScore},{l:'Experience fit',v:r.experienceScore},{l:'Resume formatting',v:r.formattingScore}];
+  const bars=[
+    {l:'Keywords match',v:r.keywordsScore,desc:r.explanations?.keywords},
+    {l:'Skills alignment',v:r.skillsScore,desc:r.explanations?.skills},
+    {l:'Experience fit',v:r.experienceScore,desc:r.explanations?.experience},
+    {l:'Resume formatting',v:r.formattingScore,desc:r.explanations?.formatting}
+  ];
   document.getElementById('bars-container').innerHTML=bars.map(b=>`
     <div class="bar-item">
       <div class="bar-label"><span>${b.l}</span><span style="font-weight:500;color:${scoreColor(b.v)}">${Math.round(b.v)}%</span></div>
       <div class="bar-bg"><div class="bar-fill" style="width:0%;background:${scoreColor(b.v)}" data-w="${Math.round(b.v)}"></div></div>
+      ${b.desc ? `<div class="bar-desc" style="font-size:11px;color:var(--text3);margin-top:4px;line-height:1.4">${escapeHtml(b.desc)}</div>` : ''}
     </div>`).join('');
   setTimeout(()=>document.querySelectorAll('.bar-fill').forEach(el=>el.style.width=el.dataset.w+'%'),100);
 

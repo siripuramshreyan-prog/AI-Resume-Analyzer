@@ -56,3 +56,48 @@ test('analysis UI validates input and reports local processing', () => {
   assert.match(html, /Analyzing locally\.\.\./);
   assert.match(html, /window\.ResumeAnalyzer\.analyze\(resume, jd\)/);
 });
+
+test('term extraction filters generic job-posting noise words', () => {
+  const text = 'Our company is looking for qualified candidates and we welcome applications';
+  const terms = analyzer.extractTerms(text);
+  assert.ok(!terms.includes('company'), 'should filter "company"');
+  assert.ok(!terms.includes('welcome'), 'should filter "welcome"');
+  assert.ok(!terms.includes('looking'), 'should filter "looking"');
+  assert.ok(!terms.includes('candidates'), 'should filter "candidates"');
+});
+
+test('meaningful job-related skills and requirements are prioritized', () => {
+  const jd = 'Our company is looking for candidates skilled in Python, Docker, and C++ to join our team';
+  const terms = analyzer.extractTerms(jd);
+  assert.ok(terms.includes('python'));
+  assert.ok(terms.includes('docker'));
+  assert.ok(terms.includes('c++'));
+  assert.ok(!terms.includes('company'));
+  assert.ok(!terms.includes('looking'));
+  assert.ok(!terms.includes('candidates'));
+});
+
+test('keyword score accurately reflects matched versus missing keywords', () => {
+  const resume = 'Summary: Python developer experienced in React and SQL. Skills: Python, React, SQL. Projects: Built APIs for 50 users. Education: Computer Science. Experience: Developed services and tested code. Certifications: Git.';
+  const jdWithMissing = 'We require a Python developer with skills in React, Docker, Kubernetes, and Cloud. Experience developing scalable services is preferred for this role.';
+  const result = analyzer.analyze(resume, jdWithMissing);
+  assert.ok(result.matchedKeywords.length > 0, 'should have matched keywords');
+  assert.ok(result.missingKeywords.length > 0, 'should have missing keywords');
+  // Keyword score must accurately reflect ratio and not be artificially inflated to 100%
+  assert.ok(result.keywordsScore < 100, 'keywordsScore should not be 100% when key requirements are missing');
+  assert.ok(result.keywordsScore > 0, 'keywordsScore should be > 0 when some keywords match');
+  assert.ok(result.matchedKeywords.includes('python'));
+  assert.ok(result.missingKeywords.includes('docker') || result.missingKeywords.includes('kubernetes'));
+});
+
+test('analysis provides clear score explanations for each category', () => {
+  const resume = 'Summary: Python developer. Skills: Python, SQL, React. Projects: Built a dashboard for 25 users. Education: Computer Science. Experience: Developed APIs and tested services. Certifications: Git.';
+  const jd = 'We require a Python developer with SQL, React, Docker, cloud, and communication skills. Experience developing APIs and testing software is preferred for this role.';
+  const result = analyzer.analyze(resume, jd);
+  assert.ok(result.explanations, 'result must include explanations object');
+  for (const cat of ['overall', 'skills', 'experience', 'keywords', 'formatting']) {
+    assert.equal(typeof result.explanations[cat], 'string');
+    assert.ok(result.explanations[cat].length > 10, `${cat} explanation should be substantive`);
+    assert.match(result.explanations[cat], /\d+%/);
+  }
+});

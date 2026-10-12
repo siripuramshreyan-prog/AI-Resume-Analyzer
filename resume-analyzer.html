@@ -3,22 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ResumeIQ — AI Resume Analyzer</title>
+<title>ResumeIQ — Intelligent ATS Resume Analyzer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0a0a0f;--bg2:#111118;--bg3:#18181f;--bg4:#1e1e28;
-  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
-  --text:#f0eff8;--text2:#9896b0;--text3:#5e5c72;
+  --bg:#0a0a0f;--bg2:#12121c;--bg3:#181824;--bg4:#222232;
+  --border:rgba(255,255,255,0.08);--border2:rgba(124,111,247,0.28);
+  --text:#f0eff8;--text2:#9896b0;--text3:#626079;
   --accent:#7c6ff7;--accent2:#a89ff9;--accent-glow:rgba(124,111,247,0.18);
-  --green:#4ade80;--green-bg:rgba(74,222,128,0.08);
-  --amber:#fbbf24;--amber-bg:rgba(251,191,36,0.08);
-  --red:#f87171;--red-bg:rgba(248,113,113,0.08);
+  --green:#4ade80;--green-bg:rgba(74,222,128,0.1);--green-border:rgba(74,222,128,0.25);
+  --amber:#fbbf24;--amber-bg:rgba(251,191,36,0.1);--amber-border:rgba(251,191,36,0.25);
+  --red:#f87171;--red-bg:rgba(248,113,113,0.1);--red-border:rgba(248,113,113,0.25);
   --font-display:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
-  --r:12px;--r-sm:8px;
+  --r:14px;--r-sm:8px;
+  --shadow-card:0 12px 32px rgba(0,0,0,0.35);
 }
 html{scroll-behavior:smooth}
 body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;overflow-x:hidden}
@@ -31,88 +32,88 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 nav{
   position:fixed;top:0;left:0;right:0;z-index:100;
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 2rem;height:64px;
-  background:rgba(10,10,15,0.88);backdrop-filter:blur(16px);
+  padding:0 2rem;height:68px;
+  background:rgba(10,10,15,0.85);backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
 }
-.nav-logo{font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--text);letter-spacing:-0.03em;cursor:pointer}
+.nav-logo{font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.03em;cursor:pointer;display:flex;align-items:center;gap:6px}
 .nav-logo span{color:var(--accent2)}
-.nav-badge{font-size:11px;font-weight:500;background:var(--accent-glow);color:var(--accent2);border:1px solid rgba(124,111,247,0.25);padding:3px 10px;border-radius:20px}
-.nav-right{display:flex;align-items:center;gap:10px}
-.nav-link{font-size:13px;font-weight:500;color:var(--text2);background:none;border:none;cursor:pointer;padding:6px 12px;border-radius:var(--r-sm);transition:color 0.2s}
-.nav-link:hover{color:var(--text)}
-.nav-cta{font-family:var(--font-display);font-size:13px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:8px 18px;cursor:pointer;transition:opacity 0.2s,transform 0.2s}
-.nav-cta:hover{opacity:0.85;transform:translateY(-1px)}
+.nav-badge{font-size:11px;font-weight:600;background:var(--accent-glow);color:var(--accent2);border:1px solid rgba(124,111,247,0.3);padding:4px 12px;border-radius:20px;letter-spacing:0.02em}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-link{font-size:13px;font-weight:500;color:var(--text2);background:none;border:none;cursor:pointer;padding:8px 14px;border-radius:var(--r-sm);transition:all 0.2s}
+.nav-link:hover{color:var(--text);background:var(--bg3)}
+.nav-cta{font-family:var(--font-display);font-size:13px;font-weight:700;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:9px 20px;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 14px rgba(124,111,247,0.3)}
+.nav-cta:hover{opacity:0.9;transform:translateY(-1px);box-shadow:0 6px 20px rgba(124,111,247,0.45)}
 .nav-user{font-size:13px;color:var(--text2);display:flex;align-items:center;gap:8px}
-.nav-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent-glow);border:1px solid rgba(124,111,247,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent2);font-family:var(--font-display)}
+.nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent-glow);border:1px solid rgba(124,111,247,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent2);font-family:var(--font-display)}
 
 /* ─── LANDING ─── */
-.hero{padding:130px 2rem 70px;text-align:center;position:relative;overflow:hidden}
-.hero-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(124,111,247,0.14) 0%,transparent 70%)}
-.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent2);background:var(--accent-glow);border:1px solid rgba(124,111,247,0.2);padding:5px 14px;border-radius:20px;margin-bottom:24px}
+.hero{padding:140px 2rem 80px;text-align:center;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 65% 50% at 50% 0%,rgba(124,111,247,0.18) 0%,transparent 70%)}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent2);background:var(--accent-glow);border:1px solid rgba(124,111,247,0.25);padding:6px 16px;border-radius:20px;margin-bottom:24px}
 .hero-eyebrow::before{content:'●';font-size:8px;animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
-.hero h1{font-family:var(--font-display);font-size:clamp(38px,6vw,70px);font-weight:800;line-height:1.05;letter-spacing:-0.04em;margin-bottom:20px}
-.hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--accent2) 0%,#c4b5fd 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{font-size:17px;color:var(--text2);max-width:520px;margin:0 auto 36px;font-weight:300;line-height:1.7}
-.hero-ctas{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:56px;flex-wrap:wrap}
-.btn-hero-primary{font-family:var(--font-display);font-size:15px;font-weight:700;background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:14px 32px;cursor:pointer;transition:all 0.2s;letter-spacing:-0.01em}
-.btn-hero-primary:hover{background:#6b5ef0;transform:translateY(-2px)}
-.btn-hero-outline{font-family:var(--font-display);font-size:14px;font-weight:600;background:none;color:var(--text2);border:1px solid var(--border2);border-radius:var(--r);padding:13px 24px;cursor:pointer;transition:all 0.2s}
-.btn-hero-outline:hover{border-color:var(--accent2);color:var(--accent2)}
-.hero-stats{display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap;margin-bottom:60px}
+.hero h1{font-family:var(--font-display);font-size:clamp(40px,6.5vw,72px);font-weight:800;line-height:1.06;letter-spacing:-0.04em;margin-bottom:22px}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--accent2) 0%,#d8b4fe 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:18px;color:var(--text2);max-width:560px;margin:0 auto 38px;font-weight:300;line-height:1.7}
+.hero-ctas{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:60px;flex-wrap:wrap}
+.btn-hero-primary{font-family:var(--font-display);font-size:15px;font-weight:700;background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:15px 34px;cursor:pointer;transition:all 0.2s;letter-spacing:-0.01em;box-shadow:0 8px 24px rgba(124,111,247,0.35)}
+.btn-hero-primary:hover{background:#6b5ef0;transform:translateY(-2px);box-shadow:0 12px 30px rgba(124,111,247,0.5)}
+.btn-hero-outline{font-family:var(--font-display);font-size:14px;font-weight:600;background:var(--bg2);color:var(--text2);border:1px solid var(--border2);border-radius:var(--r);padding:14px 26px;cursor:pointer;transition:all 0.2s}
+.btn-hero-outline:hover{border-color:var(--accent2);color:var(--accent2);background:var(--bg3)}
+.hero-stats{display:flex;align-items:center;justify-content:center;gap:2.5rem;flex-wrap:wrap;margin-bottom:60px}
 .hero-stat{text-align:center}
-.hero-stat .num{font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--text);display:block}
-.hero-stat .lbl{font-size:12px;color:var(--text3)}
-.hero-divider{width:1px;height:36px;background:var(--border2)}
+.hero-stat .num{font-family:var(--font-display);font-size:30px;font-weight:800;color:var(--text);display:block}
+.hero-stat .lbl{font-size:12px;color:var(--text3);margin-top:2px}
+.hero-divider{width:1px;height:40px;background:var(--border)}
 
 /* FEATURES */
-.features-section{max-width:1100px;margin:0 auto;padding:60px 1.5rem 80px;border-top:1px solid var(--border)}
-.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:40px}
-.feature-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;transition:border-color 0.2s}
-.feature-card:hover{border-color:var(--border2)}
-.feature-icon{font-size:24px;margin-bottom:14px}
-.feature-card h3{font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:8px;letter-spacing:-0.02em}
+.features-section{max-width:1100px;margin:0 auto;padding:70px 1.5rem 90px;border-top:1px solid var(--border)}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:44px}
+.feature-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.75rem;transition:all 0.25s}
+.feature-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:var(--shadow-card)}
+.feature-icon{font-size:26px;margin-bottom:14px}
+.feature-card h3{font-family:var(--font-display);font-size:16px;font-weight:700;margin-bottom:8px;letter-spacing:-0.02em}
 .feature-card p{font-size:13px;color:var(--text2);line-height:1.6}
 
 /* TESTIMONIALS */
 .testimonials{max-width:1100px;margin:0 auto;padding:0 1.5rem 80px}
-.testimonials-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:40px}
-.testimonial-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem}
-.t-quote{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px;font-style:italic}
-.t-author{display:flex;align-items:center;gap:10px}
-.t-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent-glow);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent2);font-family:var(--font-display);flex-shrink:0}
-.t-name{font-size:13px;font-weight:500;color:var(--text)}
+.testimonials-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:40px}
+.testimonial-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.75rem}
+.t-quote{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:18px;font-style:italic}
+.t-author{display:flex;align-items:center;gap:12px}
+.t-avatar{width:34px;height:34px;border-radius:50%;background:var(--accent-glow);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent2);font-family:var(--font-display);flex-shrink:0}
+.t-name{font-size:13px;font-weight:600;color:var(--text)}
 .t-role{font-size:11px;color:var(--text3)}
 .stars{color:var(--amber);font-size:12px;margin-bottom:12px}
 
 /* CTA BANNER */
 .cta-banner{max-width:1100px;margin:0 auto;padding:0 1.5rem 80px}
-.cta-inner{background:linear-gradient(135deg,rgba(124,111,247,0.12) 0%,var(--bg2) 100%);border:1px solid rgba(124,111,247,0.2);border-radius:var(--r);padding:3rem 2rem;text-align:center}
-.cta-inner h2{font-family:var(--font-display);font-size:clamp(24px,3vw,36px);font-weight:800;letter-spacing:-0.03em;margin-bottom:12px}
+.cta-inner{background:linear-gradient(135deg,rgba(124,111,247,0.14) 0%,var(--bg2) 100%);border:1px solid rgba(124,111,247,0.22);border-radius:var(--r);padding:3.5rem 2rem;text-align:center}
+.cta-inner h2{font-family:var(--font-display);font-size:clamp(26px,3.2vw,38px);font-weight:800;letter-spacing:-0.03em;margin-bottom:12px}
 .cta-inner p{font-size:15px;color:var(--text2);margin-bottom:28px}
 
 /* HOW */
 .how-section{border-top:1px solid var(--border);padding:80px 1.5rem;max-width:1100px;margin:0 auto}
-.section-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent2);margin-bottom:10px}
+.section-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent2);margin-bottom:10px}
 .section-title{font-family:var(--font-display);font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-0.03em;color:var(--text);margin-bottom:48px}
-.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-.step-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem}
-.step-num{font-family:var(--font-display);font-size:11px;font-weight:700;color:var(--accent2);margin-bottom:12px;background:var(--accent-glow);border:1px solid rgba(124,111,247,0.2);display:inline-block;padding:3px 10px;border-radius:20px}
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.step-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.6rem}
+.step-num{font-family:var(--font-display);font-size:11px;font-weight:800;color:var(--accent2);margin-bottom:12px;background:var(--accent-glow);border:1px solid rgba(124,111,247,0.25);display:inline-block;padding:3px 10px;border-radius:20px}
 .step-card h4{font-family:var(--font-display);font-size:16px;font-weight:700;margin-bottom:8px;letter-spacing:-0.02em}
 .step-card p{font-size:13px;color:var(--text2);line-height:1.6}
 
 /* ─── AUTH PAGE ─── */
-.auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 1.5rem 40px;position:relative}
-.auth-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 50% 60% at 50% 0%,rgba(124,111,247,0.1) 0%,transparent 70%)}
-.auth-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:420px;position:relative;z-index:1}
-.auth-card h2{font-family:var(--font-display);font-size:24px;font-weight:800;letter-spacing:-0.03em;margin-bottom:6px}
+.auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:90px 1.5rem 40px;position:relative}
+.auth-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 50% 60% at 50% 0%,rgba(124,111,247,0.12) 0%,transparent 70%)}
+.auth-card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:2.5rem 2rem;width:100%;max-width:430px;position:relative;z-index:1;box-shadow:var(--shadow-card)}
+.auth-card h2{font-family:var(--font-display);font-size:25px;font-weight:800;letter-spacing:-0.03em;margin-bottom:6px}
 .auth-card .auth-sub{font-size:14px;color:var(--text2);margin-bottom:28px}
 .auth-card .auth-sub a{color:var(--accent2);cursor:pointer;text-decoration:none}
 .auth-card .auth-sub a:hover{text-decoration:underline}
 .form-group{margin-bottom:16px}
-.form-group label{font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;letter-spacing:0.03em}
-.form-group input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:var(--font-body);font-size:14px;padding:10px 14px;outline:none;transition:border-color 0.2s}
+.form-group label{font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;letter-spacing:0.02em}
+.form-group input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:var(--font-body);font-size:14px;padding:11px 14px;outline:none;transition:border-color 0.2s}
 .form-group input::placeholder{color:var(--text3)}
 .form-group input:focus{border-color:rgba(124,111,247,0.5)}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -121,81 +122,138 @@ nav{
 .btn-auth:disabled{opacity:0.5;cursor:not-allowed;transform:none}
 .auth-divider{display:flex;align-items:center;gap:12px;margin:20px 0;font-size:12px;color:var(--text3)}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
-.btn-google{width:100%;font-family:var(--font-body);font-size:14px;font-weight:500;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:var(--r);padding:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s}
+.btn-google{width:100%;font-family:var(--font-body);font-size:14px;font-weight:500;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--r);padding:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s}
 .btn-google:hover{border-color:var(--border2);background:var(--bg4)}
-.auth-err{background:var(--red-bg);border:1px solid rgba(248,113,113,0.2);border-radius:var(--r-sm);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:14px;display:none}
-.auth-success{background:var(--green-bg);border:1px solid rgba(74,222,128,0.2);border-radius:var(--r-sm);padding:10px 14px;font-size:13px;color:var(--green);margin-bottom:14px;display:none}
+.auth-err{background:var(--red-bg);border:1px solid var(--red-border);border-radius:var(--r-sm);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:14px;display:none}
+.auth-success{background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--r-sm);padding:10px 14px;font-size:13px;color:var(--green);margin-bottom:14px;display:none}
 .forgot-link{font-size:12px;color:var(--text3);cursor:pointer;text-align:right;display:block;margin-top:4px}
 .forgot-link:hover{color:var(--accent2)}
 .terms-note{font-size:11px;color:var(--text3);text-align:center;margin-top:16px;line-height:1.5}
 
 /* ─── APP PAGE ─── */
-.analyzer-section{max-width:1100px;margin:0 auto;padding:90px 1.5rem 80px}
-.app-header{margin-bottom:28px}
-.app-header h1{font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px}
-.app-header p{font-size:14px;color:var(--text2)}
-.analyzer-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.input-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;transition:border-color 0.2s}
-.input-card:focus-within{border-color:var(--border2)}
-.input-card-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.input-icon{width:28px;height:28px;background:var(--bg4);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:14px}
-.input-card-header label{font-family:var(--font-display);font-size:13px;font-weight:600;color:var(--text)}
-.input-card-header .sub{font-size:12px;color:var(--text3);margin-left:auto}
-textarea{width:100%;height:200px;resize:vertical;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:var(--font-body);font-size:13px;line-height:1.6;padding:12px 14px;outline:none;transition:border-color 0.2s}
+.analyzer-section{max-width:1120px;margin:0 auto;padding:96px 1.5rem 80px}
+.app-header{margin-bottom:30px}
+.app-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--accent2);background:var(--accent-glow);border:1px solid rgba(124,111,247,0.25);padding:4px 12px;border-radius:20px;margin-bottom:10px;letter-spacing:0.04em;text-transform:uppercase}
+.app-header h1{font-family:var(--font-display);font-size:28px;font-weight:800;letter-spacing:-0.03em;margin-bottom:6px}
+.app-header p{font-size:15px;color:var(--text2);max-width:700px}
+.analyzer-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.input-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.4rem;transition:all 0.25s;box-shadow:0 4px 18px rgba(0,0,0,0.2)}
+.input-card:focus-within{border-color:var(--border2);box-shadow:0 8px 24px rgba(124,111,247,0.12)}
+.input-card-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.input-icon{width:32px;height:32px;background:var(--bg4);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.input-header-text{flex:1;min-width:120px}
+.input-card-header label{font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--text);display:block}
+.input-card-header .sub{font-size:11px;color:var(--text3);display:block}
+.input-actions{display:flex;align-items:center;gap:8px}
+.btn-sample,.btn-upload{font-family:var(--font-body);font-size:11px;font-weight:600;background:var(--bg4);color:var(--text2);border:1px solid var(--border);border-radius:6px;padding:5px 10px;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:4px}
+.btn-sample:hover,.btn-upload:hover{background:rgba(124,111,247,0.16);border-color:var(--accent2);color:var(--text)}
+textarea{width:100%;height:220px;resize:vertical;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:var(--font-body);font-size:13px;line-height:1.65;padding:14px;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
 textarea::placeholder{color:var(--text3)}
-textarea:focus{border-color:rgba(124,111,247,0.4)}
-.btn-row{display:flex;gap:12px;align-items:center;margin-bottom:24px}
-.btn-primary{flex:1;font-family:var(--font-display);font-size:15px;font-weight:700;background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:14px 28px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;letter-spacing:-0.01em}
-.btn-primary:hover{background:#6b5ef0;transform:translateY(-1px)}
-.btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none}
-.btn-clear{font-family:var(--font-body);font-size:13px;font-weight:500;background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:var(--r);padding:14px 20px;cursor:pointer;transition:all 0.2s}
-.btn-clear:hover{border-color:var(--border2);color:var(--text)}
-#results{display:none;animation:fadeUp 0.5s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.score-hero{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:2rem;display:flex;align-items:center;gap:2rem;margin-bottom:16px;flex-wrap:wrap}
+textarea:focus{border-color:rgba(124,111,247,0.5);box-shadow:0 0 0 3px rgba(124,111,247,0.12)}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--text3)}
+.char-count.valid{color:var(--green);font-weight:500}
+.btn-row{display:flex;gap:14px;align-items:center;margin-bottom:28px}
+.btn-primary{flex:1;font-family:var(--font-display);font-size:15px;font-weight:800;background:linear-gradient(135deg,#7c6ff7 0%,#6355ee 100%);color:#fff;border:none;border-radius:var(--r);padding:15px 30px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.25s;letter-spacing:-0.01em;box-shadow:0 6px 20px rgba(124,111,247,0.35)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(124,111,247,0.5)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-clear{font-family:var(--font-body);font-size:14px;font-weight:600;background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:var(--r);padding:15px 24px;cursor:pointer;transition:all 0.2s}
+.btn-clear:hover{border-color:var(--border2);color:var(--text);background:var(--bg3)}
+
+/* RESULTS CONTAINER */
+#results{display:none;animation:fadeUp 0.5s cubic-bezier(0.16,1,0.3,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* SCORE HERO */
+.score-hero{
+  background:linear-gradient(135deg,rgba(124,111,247,0.1) 0%,var(--bg2) 65%,rgba(18,18,27,0.95) 100%);
+  border:1px solid rgba(124,111,247,0.24);
+  border-radius:18px;padding:2.2rem;display:flex;align-items:center;gap:2.2rem;margin-bottom:20px;
+  box-shadow:0 18px 44px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.06);
+}
 .score-circle-wrap{flex-shrink:0;position:relative}
-.score-circle-wrap svg{display:block}
+.score-circle-wrap svg{display:block;filter:drop-shadow(0 0 12px rgba(124,111,247,0.35))}
 .score-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.score-num .big{font-family:var(--font-display);font-size:36px;font-weight:800;line-height:1}
-.score-num .pct{font-size:12px;color:var(--text3)}
-.score-hero-info{flex:1;min-width:220px}
-.score-hero-info h2{font-family:var(--font-display);font-size:22px;font-weight:700;margin-bottom:6px;letter-spacing:-0.02em}
+.score-num .big{font-family:var(--font-display);font-size:38px;font-weight:800;line-height:1;letter-spacing:-0.03em}
+.score-num .pct{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-top:2px}
+.score-hero-info{flex:1;min-width:240px}
+.score-title-row{display:flex;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap}
+.score-hero-info h2{font-family:var(--font-display);font-size:24px;font-weight:800;letter-spacing:-0.02em}
+.score-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;border:1px solid var(--border);background:var(--bg3);letter-spacing:0.02em}
 .score-hero-info p{font-size:14px;color:var(--text2);line-height:1.6}
-.mini-scores{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
-.mini-score{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 14px;text-align:center;min-width:90px}
-.mini-score .v{font-family:var(--font-display);font-size:20px;font-weight:700;display:block}
-.mini-score .l{font-size:11px;color:var(--text3)}
-.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.result-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem}
-.result-card h3{font-family:var(--font-display);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:14px}
-.bar-item{margin-bottom:14px}
+.mini-scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:12px;margin-top:18px}
+.mini-score{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center;transition:all 0.2s}
+.mini-score:hover{transform:translateY(-2px);border-color:rgba(124,111,247,0.3)}
+.mini-score .v{font-family:var(--font-display);font-size:22px;font-weight:800;display:block}
+.mini-score .l{font-size:11px;color:var(--text3);margin-top:2px;font-weight:500}
+
+/* VERDICT CARD */
+.summary-card{
+  background:linear-gradient(135deg,rgba(124,111,247,0.08) 0%,var(--bg2) 100%);
+  border:1px solid rgba(124,111,247,0.18);
+  border-radius:var(--r);padding:1.6rem;margin-bottom:20px;
+}
+.summary-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.summary-icon{color:var(--accent2);font-size:14px}
+.summary-card h3{font-family:var(--font-display);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent2)}
+.summary-card p{font-size:14px;color:var(--text2);line-height:1.7}
+
+/* RESULTS GRIDS */
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.result-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;box-shadow:0 4px 18px rgba(0,0,0,0.2)}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:12px}
+.result-card h3{font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:-0.01em;color:var(--text)}
+.card-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);background:var(--bg3);padding:2px 8px;border-radius:6px}
+.card-count{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px}
+.match-count{color:var(--green);background:var(--green-bg);border:1px solid var(--green-border)}
+.miss-count{color:var(--red);background:var(--red-bg);border:1px solid var(--red-border)}
+
+/* PROGRESS BARS */
+.bar-item{margin-bottom:16px}
 .bar-item:last-child{margin-bottom:0}
-.bar-label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
-.bar-label span:first-child{color:var(--text2)}
-.bar-bg{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
-.bar-fill{height:100%;border-radius:3px;transition:width 1s cubic-bezier(0.4,0,0.2,1)}
-.tag-cloud{display:flex;flex-wrap:wrap;gap:6px}
-.tag{font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:4px}
-.tag-match{background:var(--green-bg);color:var(--green);border:1px solid rgba(74,222,128,0.15)}
-.tag-miss{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,113,113,0.15)}
-.suggestion-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.5;color:var(--text2)}
+.bar-label{display:flex;justify-content:space-between;font-size:13px;font-weight:500;margin-bottom:6px}
+.bar-label span:first-child{color:var(--text)}
+.bar-bg{height:7px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width 1s cubic-bezier(0.16,1,0.3,1)}
+.bar-desc{font-size:12px;color:var(--text2);margin-top:6px;line-height:1.5}
+
+/* TAGS */
+.tag-cloud{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-size:12px;font-weight:600;padding:6px 12px;border-radius:20px;display:inline-flex;align-items:center;gap:6px;transition:all 0.2s;letter-spacing:0.01em}
+.tag:hover{transform:translateY(-1px)}
+.tag-match{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);box-shadow:0 2px 8px rgba(74,222,128,0.08)}
+.tag-miss{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);box-shadow:0 2px 8px rgba(248,113,113,0.08)}
+.empty-state{font-size:13px;color:var(--text3);font-style:italic}
+
+/* SUGGESTIONS */
+.suggestion-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;color:var(--text2)}
 .suggestion-item:last-child{border-bottom:none}
-.sug-num{font-family:var(--font-display);font-size:11px;font-weight:700;color:var(--accent2);background:var(--accent-glow);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.summary-card{background:linear-gradient(135deg,rgba(124,111,247,0.06) 0%,var(--bg2) 100%);border:1px solid rgba(124,111,247,0.15);border-radius:var(--r);padding:1.5rem;margin-bottom:16px}
-.summary-card h3{font-family:var(--font-display);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--accent2);margin-bottom:10px}
-.summary-card p{font-size:14px;color:var(--text2);line-height:1.75}
-.error-bar{background:var(--red-bg);border:1px solid rgba(248,113,113,0.2);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;color:var(--red);margin-bottom:16px;display:none}
+.sug-num{font-family:var(--font-display);font-size:11px;font-weight:800;color:var(--accent2);background:var(--accent-glow);border:1px solid rgba(124,111,247,0.25);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+
+/* ERRORS & LOADERS */
+.error-bar{background:var(--red-bg);border:1px solid var(--red-border);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;color:var(--red);margin-bottom:18px;display:none;animation:fadeUp 0.3s ease}
 .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-footer{border-top:1px solid var(--border);padding:32px 2rem;text-align:center;font-size:12px;color:var(--text3)}
-footer strong{color:var(--text2);font-weight:500}
+footer{border-top:1px solid var(--border);padding:36px 2rem;text-align:center;font-size:12px;color:var(--text3)}
+footer strong{color:var(--text2);font-weight:600}
 
-@media(max-width:640px){
+/* RESPONSIVE */
+@media(max-width:860px){
   .analyzer-grid,.results-grid,.form-row{grid-template-columns:1fr}
-  .score-hero{flex-direction:column;text-align:center}
+  .score-hero{flex-direction:column;text-align:center;gap:1.5rem}
+  .score-title-row{justify-content:center}
+  .mini-scores{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:640px){
+  nav{padding:0 1.2rem}
+  .analyzer-section{padding:84px 1rem 60px}
   .nav-badge{display:none}
-  .hero-ctas{flex-direction:column;align-items:stretch;max-width:280px;margin-left:auto;margin-right:auto}
+  .hero-ctas{flex-direction:column;align-items:stretch;max-width:300px;margin-left:auto;margin-right:auto}
+  .btn-row{flex-direction:column}
+  .btn-primary,.btn-clear{width:100%}
+  .hero-stats{gap:1.2rem}
+  .hero-divider{display:none}
 }
 </style>
 </head>
@@ -204,7 +262,7 @@ footer strong{color:var(--text2);font-weight:500}
 <!-- NAV -->
 <nav>
   <div class="nav-logo" onclick="showPage('landing')">Resume<span>IQ</span></div>
-  <div class="nav-badge" id="nav-badge">✦ Powered by Claude AI</div>
+  <div class="nav-badge" id="nav-badge">✦ Client-Side ATS Analyzer</div>
   <div class="nav-right" id="nav-right-guest">
     <button class="nav-link" onclick="showPage('login')">Log in</button>
     <button class="nav-cta" onclick="showPage('signup')">Get started free</button>
@@ -222,9 +280,9 @@ footer strong{color:var(--text2);font-weight:500}
 <div class="page active" id="page-landing">
   <section class="hero">
     <div class="hero-bg"></div>
-    <div class="hero-eyebrow">AI-powered career tool</div>
+    <div class="hero-eyebrow">Local ATS Resume Intelligence</div>
     <h1>Get your resume<br><em>actually noticed</em></h1>
-    <p>Paste your resume and job description. Our AI scores your match, finds keyword gaps, and tells you exactly what to fix — in seconds.</p>
+    <p>Paste your resume and job description. Our client-side ATS engine scores your match, finds technical skill gaps, and tells you exactly what to fix — in milliseconds.</p>
     <div class="hero-ctas">
       <button class="btn-hero-primary" onclick="showPage('signup')">✦ Start for free</button>
       <button class="btn-hero-outline" onclick="showPage('login')">I have an account</button>
@@ -234,7 +292,7 @@ footer strong{color:var(--text2);font-weight:500}
       <div class="hero-divider"></div>
       <div class="hero-stat"><span class="num">3x</span><span class="lbl">more callbacks with keyword match</span></div>
       <div class="hero-divider"></div>
-      <div class="hero-stat"><span class="num">&lt;10s</span><span class="lbl">for full AI analysis</span></div>
+      <div class="hero-stat"><span class="num">&lt;1s</span><span class="lbl">for full local analysis</span></div>
     </div>
   </section>
 
@@ -245,22 +303,22 @@ footer strong{color:var(--text2);font-weight:500}
       <div class="feature-card">
         <div class="feature-icon">🎯</div>
         <h3>ATS match scoring</h3>
-        <p>Get a precise 0–100% match score across skills, experience, keywords, and formatting — just like real ATS systems.</p>
+        <p>Get a precise 0–100% match score across skills, experience, keywords, and formatting — calibrated for real recruiter workflows.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon">🔍</div>
         <h3>Keyword gap analysis</h3>
-        <p>Instantly see which keywords recruiters are looking for that are missing from your resume — and which ones you already have.</p>
+        <p>Instantly see which technical keywords recruiters are looking for that are missing from your resume — and which ones you already match.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon">💡</div>
         <h3>Actionable suggestions</h3>
-        <p>Get 5 specific, tailored improvement tips — not generic advice. Real changes that make a real difference.</p>
+        <p>Get 5 tailored improvement tips with concrete action steps — not generic advice. Real changes that make a measurable difference.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon">⚡</div>
-        <h3>Instant AI analysis</h3>
-        <p>Powered by Claude AI — one of the most advanced language models. Results in under 10 seconds, every time.</p>
+        <h3>Instant local analysis</h3>
+        <p>Runs 100% locally in your browser with complete data privacy. Real-time ATS keyword matching and scoring in milliseconds.</p>
       </div>
     </div>
   </section>
@@ -274,7 +332,7 @@ footer strong{color:var(--text2);font-weight:500}
         <p class="t-quote">"My match score went from 42% to 81% after following the suggestions. Got a call from the company the next day."</p>
         <div class="t-author">
           <div class="t-avatar">AK</div>
-          <div><div class="t-name">Arjun K.</div><div class="t-role">SWE Intern @ Flipkart</div></div>
+          <div><div class="t-name">Arjun K.</div><div class="t-role">SWE Intern @ Tech Partner</div></div>
         </div>
       </div>
       <div class="testimonial-card">
@@ -282,7 +340,7 @@ footer strong{color:var(--text2);font-weight:500}
         <p class="t-quote">"I had no idea what ATS was. This tool showed me exactly which keywords I was missing. Landed 3 interviews in a week."</p>
         <div class="t-author">
           <div class="t-avatar">PS</div>
-          <div><div class="t-name">Priya S.</div><div class="t-role">Data Analyst @ Infosys</div></div>
+          <div><div class="t-name">Priya S.</div><div class="t-role">Data Analyst @ Analytics Co</div></div>
         </div>
       </div>
       <div class="testimonial-card">
@@ -290,7 +348,7 @@ footer strong{color:var(--text2);font-weight:500}
         <p class="t-quote">"Used this for every application during placement season. Got placed at my dream company. Highly recommend to all CS students."</p>
         <div class="t-author">
           <div class="t-avatar">RV</div>
-          <div><div class="t-name">Rohit V.</div><div class="t-role">Full Stack Dev @ TCS</div></div>
+          <div><div class="t-name">Rohit V.</div><div class="t-role">Full Stack Dev @ Cloud Platform</div></div>
         </div>
       </div>
     </div>
@@ -308,14 +366,14 @@ footer strong{color:var(--text2);font-weight:500}
     <div class="section-label">How it works</div>
     <div class="section-title">Four steps to a stronger application</div>
     <div class="steps-grid">
-      <div class="step-card"><div class="step-num">01</div><h4>Create an account</h4><p>Sign up for free — no credit card needed. Your analyses are saved to your account.</p></div>
-      <div class="step-card"><div class="step-num">02</div><h4>Paste your resume</h4><p>Copy your resume as plain text — skills, experience, education, everything.</p></div>
-      <div class="step-card"><div class="step-num">03</div><h4>Add the job description</h4><p>Copy the full JD from LinkedIn, Naukri, Internshala, or any job board.</p></div>
-      <div class="step-card"><div class="step-num">04</div><h4>Fix & reapply</h4><p>Apply the AI suggestions, re-run to verify improvement, then apply with confidence.</p></div>
+      <div class="step-card"><div class="step-num">01</div><h4>Create an account</h4><p>Sign up for free — no credit card needed. Your analyses run client-side with complete privacy.</p></div>
+      <div class="step-card"><div class="step-num">02</div><h4>Paste your resume</h4><p>Copy your resume as plain text — skills, experience, education, projects, everything.</p></div>
+      <div class="step-card"><div class="step-num">03</div><h4>Add the job description</h4><p>Copy the full JD from LinkedIn, job boards, or corporate career portals.</p></div>
+      <div class="step-card"><div class="step-num">04</div><h4>Fix & reapply</h4><p>Apply the suggestions, verify your improved match score, then apply with confidence.</p></div>
     </div>
   </section>
 
-  <footer>Built with ❤ using <strong>Claude AI</strong> · A portfolio project for internship &amp; job applications</footer>
+  <footer>Built with ❤ for job seekers · A privacy-first ATS resume optimization tool</footer>
 </div>
 
 <!-- ═══════════ LOGIN PAGE ═══════════ -->
@@ -358,11 +416,11 @@ footer strong{color:var(--text2);font-weight:500}
       <div class="form-row">
         <div class="form-group">
           <label>First name</label>
-          <input type="text" id="signup-fname" placeholder="Rahul">
+          <input type="text" id="signup-fname" placeholder="Alex">
         </div>
         <div class="form-group">
           <label>Last name</label>
-          <input type="text" id="signup-lname" placeholder="Sharma">
+          <input type="text" id="signup-lname" placeholder="Rivera">
         </div>
       </div>
       <div class="form-group">
@@ -388,70 +446,134 @@ footer strong{color:var(--text2);font-weight:500}
 <div class="page" id="page-app">
   <section class="analyzer-section">
     <div class="app-header">
-      <h1>✦ Resume analyzer</h1>
-      <p>Paste your resume and a job description to get your AI match score instantly</p>
+      <div class="app-badge">✦ Client-Side ATS Intelligence</div>
+      <h1>Resume Analyzer &amp; ATS Optimizer</h1>
+      <p>Paste your resume and a job description to get your match score instantly. Analysis runs locally and is not an official ATS score or an AI judgment.</p>
     </div>
 
     <div class="analyzer-grid">
       <div class="input-card">
         <div class="input-card-header">
           <div class="input-icon">📄</div>
-          <label for="resume-input">Your resume</label>
-          <span class="sub">Paste as plain text</span>
+          <div class="input-header-text">
+            <label for="resume-input">Your resume</label>
+            <span class="sub">Plain text, Markdown, or pasted content</span>
+          </div>
+          <div class="input-actions">
+            <button type="button" class="btn-sample" onclick="loadSampleResume()">📋 Sample</button>
+            <label class="btn-upload" title="Upload local text file">
+              📂 Upload <input type="file" id="resume-file" accept=".txt,.md" style="display:none" onchange="handleFileUpload(event, 'resume-input')">
+            </label>
+          </div>
         </div>
-        <textarea id="resume-input" placeholder="Paste your full resume here...&#10;&#10;Include: contact info, skills, work experience, education, projects, etc."></textarea>
+        <textarea id="resume-input" oninput="updateCharCount('resume')" placeholder="Paste your full resume here...&#10;&#10;Include: summary, technical skills, experience, education, projects, etc."></textarea>
+        <div class="card-footer">
+          <span class="char-count" id="resume-char-count">0 characters (min. 80)</span>
+        </div>
       </div>
+
       <div class="input-card">
         <div class="input-card-header">
           <div class="input-icon">💼</div>
-          <label for="jd-input">Job description</label>
-          <span class="sub">From LinkedIn, Naukri, etc.</span>
+          <div class="input-header-text">
+            <label for="jd-input">Job description</label>
+            <span class="sub">Role requirements, skills, and qualifications</span>
+          </div>
+          <div class="input-actions">
+            <button type="button" class="btn-sample" onclick="loadSampleJD()">💼 Sample</button>
+            <label class="btn-upload" title="Upload local text file">
+              📂 Upload <input type="file" id="jd-file" accept=".txt,.md" style="display:none" onchange="handleFileUpload(event, 'jd-input')">
+            </label>
+          </div>
         </div>
-        <textarea id="jd-input" placeholder="Paste the job description here...&#10;&#10;Include: role title, required skills, responsibilities, qualifications, etc."></textarea>
+        <textarea id="jd-input" oninput="updateCharCount('jd')" placeholder="Paste the job description here...&#10;&#10;Include: role title, required technical skills, responsibilities, etc."></textarea>
+        <div class="card-footer">
+          <span class="char-count" id="jd-char-count">0 characters (min. 80)</span>
+        </div>
       </div>
     </div>
 
-    <div class="error-bar" id="error-bar">⚠ Please paste both your resume and the job description before analyzing.</div>
+    <div class="error-bar" id="error-bar">⚠ Please enter a fuller resume and job description (at least 80 characters each).</div>
 
     <div class="btn-row">
       <button class="btn-primary" id="analyze-btn" onclick="analyzeResume()">
-        <span id="btn-text">✦ Analyze my resume</span>
+        <span id="btn-text">✦ Analyze resume</span>
       </button>
       <button class="btn-clear" onclick="clearAll()">Clear</button>
     </div>
 
     <div id="results">
+      <!-- HERO SCORE CARD -->
       <div class="score-hero">
         <div class="score-circle-wrap">
-          <svg width="110" height="110" viewBox="0 0 110 110">
-            <circle cx="55" cy="55" r="46" fill="none" stroke="#1e1e28" stroke-width="10"/>
-            <circle id="score-ring" cx="55" cy="55" r="46" fill="none" stroke="#7c6ff7" stroke-width="10" stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="289" transform="rotate(-90 55 55)" style="transition:stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)"/>
+          <svg width="120" height="120" viewBox="0 0 110 110">
+            <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+            <circle id="score-ring" cx="55" cy="55" r="46" fill="none" stroke="#7c6ff7" stroke-width="10" stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="289" transform="rotate(-90 55 55)" style="transition:stroke-dashoffset 1.2s cubic-bezier(0.16,1,0.3,1)"/>
           </svg>
           <div class="score-num"><span class="big" id="score-big">—</span><span class="pct">match</span></div>
         </div>
         <div class="score-hero-info">
-          <h2 id="score-label">Analyzing...</h2>
+          <div class="score-title-row">
+            <h2 id="score-label">Analyzing...</h2>
+            <span class="score-badge" id="score-status-badge">Heuristic ATS Score</span>
+          </div>
           <p id="score-desc"></p>
           <div class="mini-scores">
-            <div class="mini-score"><span class="v" id="ms-skills">—</span><span class="l">Skills</span></div>
-            <div class="mini-score"><span class="v" id="ms-exp">—</span><span class="l">Experience</span></div>
-            <div class="mini-score"><span class="v" id="ms-kw">—</span><span class="l">Keywords</span></div>
-            <div class="mini-score"><span class="v" id="ms-fmt">—</span><span class="l">Formatting</span></div>
+            <div class="mini-score"><span class="v" id="ms-skills">—</span><span class="l">🎯 Skills</span></div>
+            <div class="mini-score"><span class="v" id="ms-exp">—</span><span class="l">⚡ Experience</span></div>
+            <div class="mini-score"><span class="v" id="ms-kw">—</span><span class="l">🔑 Keywords</span></div>
+            <div class="mini-score"><span class="v" id="ms-fmt">—</span><span class="l">📑 Formatting</span></div>
           </div>
         </div>
       </div>
-      <div class="summary-card"><h3>✦ AI verdict</h3><p id="ai-summary">—</p></div>
-      <div class="results-grid">
-        <div class="result-card"><h3>Score breakdown</h3><div id="bars-container"></div></div>
-        <div class="result-card"><h3>Top improvements</h3><div id="suggestions-container"></div></div>
+
+      <!-- SUMMARY VERDICT -->
+      <div class="summary-card">
+        <div class="summary-header">
+          <span class="summary-icon">✦</span>
+          <h3>Match Verdict &amp; Summary</h3>
+        </div>
+        <p id="ai-summary">This is a local keyword and resume-structure comparison, not an official ATS score or an AI judgment.</p>
       </div>
+
+      <!-- BREAKDOWN & SUGGESTIONS -->
       <div class="results-grid">
-        <div class="result-card"><h3>✅ Matched keywords</h3><div class="tag-cloud" id="matched-tags"></div></div>
-        <div class="result-card"><h3>⚠ Missing keywords</h3><div class="tag-cloud" id="missing-tags"></div></div>
+        <div class="result-card">
+          <div class="card-head">
+            <h3>📊 Detailed Score Breakdown</h3>
+            <span class="card-badge">Weighted Metrics</span>
+          </div>
+          <div id="bars-container"></div>
+        </div>
+        <div class="result-card">
+          <div class="card-head">
+            <h3>💡 Targeted Improvement Plan</h3>
+            <span class="card-badge">Top Actions</span>
+          </div>
+          <div id="suggestions-container"></div>
+        </div>
+      </div>
+
+      <!-- KEYWORDS MATCHER -->
+      <div class="results-grid">
+        <div class="result-card">
+          <div class="card-head">
+            <h3>✅ Matched Technical Keywords</h3>
+            <span class="card-count match-count" id="matched-count">0 matched</span>
+          </div>
+          <div class="tag-cloud" id="matched-tags"></div>
+        </div>
+        <div class="result-card">
+          <div class="card-head">
+            <h3>⚠ Target Keyword Gaps</h3>
+            <span class="card-count miss-count" id="missing-count">0 gaps</span>
+          </div>
+          <div class="tag-cloud" id="missing-tags"></div>
+        </div>
       </div>
     </div>
   </section>
-  <footer>Built with ❤ using <strong>Claude AI</strong> · A portfolio project for internship &amp; job applications</footer>
+  <footer>Built with ❤ for job seekers · A privacy-first ATS resume optimization tool</footer>
 </div>
 
 <script src="js/analyzer.js"></script>
@@ -462,7 +584,8 @@ const users = {};
 
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
+  const target = document.getElementById('page-' + name);
+  if (target) target.classList.add('active');
   window.scrollTo(0,0);
 }
 
@@ -499,7 +622,7 @@ function handleSignup() {
   updateNav();
   suc.textContent = '🎉 Account created! Redirecting...';
   suc.style.display = 'block';
-  setTimeout(() => showPage('app'), 1000);
+  setTimeout(() => showPage('app'), 800);
 }
 
 function handleLogin() {
@@ -510,12 +633,10 @@ function handleLogin() {
 
   if (!email || !pw) { err.textContent = 'Please enter your email and password.'; err.style.display = 'block'; return; }
 
-  // Demo: accept any login if account exists OR create session for demo
   if (users[email]) {
     if (users[email].pw !== pw) { err.textContent = 'Incorrect password. Please try again.'; err.style.display = 'block'; return; }
     currentUser = { fname: users[email].fname, lname: users[email].lname, email };
   } else {
-    // Demo mode: allow any login
     const namePart = email.split('@')[0];
     currentUser = { fname: namePart.charAt(0).toUpperCase() + namePart.slice(1), lname: '', email };
   }
@@ -535,24 +656,103 @@ function logout() {
   showPage('landing');
 }
 
+// ── Sample data ──
+const SAMPLE_RESUME = `Alex Rivera — Full Stack Software Engineer
+Summary: Results-driven Software Engineer with 4+ years of experience designing and deploying scalable web services and cloud-native applications. Experienced in Python, React, TypeScript, SQL, and Docker.
+
+Skills:
+• Programming: Python, JavaScript, TypeScript, SQL, HTML, CSS, C++
+• Frameworks & Libraries: React, Node.js, Express, Flask, FastAPI
+• Databases & Cloud: PostgreSQL, MongoDB, Redis, Docker, AWS (S3, EC2), Git
+• Core Competencies: RESTful APIs, Microservices, CI/CD, Agile/Scrum, Collaboration
+
+Experience:
+Senior Software Engineer | TechNova Solutions (2022 – Present)
+• Built and maintained distributed RESTful APIs in Python and FastAPI, serving over 150,000 daily active users with 99.9% uptime.
+• Developed interactive web application dashboards in React and TypeScript, improving user engagement by 32%.
+• Automated deployment pipelines using Docker and GitHub Actions, reducing release cycles by 45%.
+• Led a squad of 4 developers in sprint planning, code reviews, and architectural design.
+
+Software Developer | CloudWave Systems (2020 – 2022)
+• Implemented backend microservices in Node.js and PostgreSQL, processing 2M+ records daily.
+• Optimized complex SQL database queries, improving query response latency by 40%.
+• Tested software modules with 88% unit test coverage using Jest and PyTest.
+
+Education:
+Bachelor of Science in Computer Science | State University (2016 – 2020)
+
+Certifications:
+AWS Certified Developer Associate`;
+
+const SAMPLE_JD = `Senior Full Stack Developer (Python & Cloud Platform)
+Seeking an experienced engineer with skills in Python, React, TypeScript, Docker, Kubernetes, and AWS for cloud platform services.
+
+Key Responsibilities:
+• Design, build, and deploy high-performance microservices and cloud platform architectures.
+• Collaborate with cross-functional product and engineering teams in an Agile environment.
+• Write clean, maintainable, and well-tested code with comprehensive test automation.
+• Optimize database schemas and queries for high throughput and low latency.
+
+Required Technical Skills:
+• Strong experience with Python, React, and TypeScript.
+• Hands-on expertise with Docker, Kubernetes, and AWS cloud infrastructure.
+• Solid background in SQL databases (PostgreSQL) and NoSQL stores (Redis, MongoDB).
+• Experience designing and building RESTful APIs and distributed microservices.
+• Knowledge of CI/CD pipelines, Git version control, and automated testing.`;
+
+function loadSampleResume() {
+  document.getElementById('resume-input').value = SAMPLE_RESUME;
+  updateCharCount('resume');
+}
+
+function loadSampleJD() {
+  document.getElementById('jd-input').value = SAMPLE_JD;
+  updateCharCount('jd');
+}
+
+function handleFileUpload(event, targetId) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById(targetId).value = e.target.result;
+    updateCharCount(targetId === 'resume-input' ? 'resume' : 'jd');
+  };
+  reader.readAsText(file);
+}
+
+function updateCharCount(type) {
+  const val = document.getElementById(type + '-input').value.trim();
+  const el = document.getElementById(type + '-char-count');
+  if (el) {
+    el.textContent = val.length + ' characters ' + (val.length >= 80 ? '(✓ ready)' : '(min. 80)');
+    if (val.length >= 80) el.classList.add('valid');
+    else el.classList.remove('valid');
+  }
+}
+
 // ── Analyzer ──
 function clearAll() {
   document.getElementById('resume-input').value = '';
   document.getElementById('jd-input').value = '';
+  updateCharCount('resume');
+  updateCharCount('jd');
   document.getElementById('results').style.display = 'none';
   document.getElementById('error-bar').style.display = 'none';
 }
 
-function scoreColor(n) { return n>=70?'#4ade80':n>=45?'#fbbf24':'#f87171'; }
-function scoreLabel(n) { return n>=80?'Excellent match':n>=65?'Strong match':n>=45?'Moderate match':'Weak match — needs work'; }
+function scoreColor(n) { return n>=75?'#4ade80':n>=50?'#fbbf24':'#f87171'; }
+function scoreLabel(n) { return n>=80?'Excellent match':n>=65?'Strong match':n>=50?'Moderate match':'Weak match — needs work'; }
 function scoreDesc(n) {
-  if(n>=80) return 'Your resume is well-aligned with this role. Apply with confidence!';
-  if(n>=65) return 'Good alignment — a few targeted improvements could push you to the top.';
-  if(n>=45) return 'Some relevant experience, but key gaps exist. Address the missing keywords.';
-  return 'Significant gaps between your resume and this role. Use the suggestions below.';
+  if(n>=80) return 'Your resume is strongly aligned with this role. Technical skills and qualifications match closely.';
+  if(n>=65) return 'Good technical alignment — addressing a few key keyword gaps could push you to the top tier.';
+  if(n>=50) return 'Some relevant technical experience, but key skills are missing. Add the missing keywords below.';
+  return 'Significant technical gaps between your resume and this role. Address the missing skills before applying.';
 }
 
-const escapeHtml = window.ResumeAnalyzer.escapeHtml;
+const escapeHtml = (value) => (window.ResumeAnalyzer && window.ResumeAnalyzer.escapeHtml)
+  ? window.ResumeAnalyzer.escapeHtml(value)
+  : String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 function analyzeResume() {
   if (!currentUser) { showPage('login'); return; }
@@ -588,41 +788,74 @@ function analyzeResume() {
 function renderResults(r) {
   const score = Math.round(r.overallScore);
   const color = scoreColor(score);
-  const circ = 2*Math.PI*46;
+  const circ = 2 * Math.PI * 46;
   const ring = document.getElementById('score-ring');
-  ring.style.strokeDashoffset = circ; ring.style.stroke = color;
-  setTimeout(()=>ring.style.strokeDashoffset = circ-(score/100)*circ, 50);
+  ring.style.strokeDashoffset = circ;
+  ring.style.stroke = color;
+  setTimeout(() => ring.style.strokeDashoffset = circ - (score / 100) * circ, 50);
 
-  document.getElementById('score-big').textContent = score+'%';
+  document.getElementById('score-big').textContent = score + '%';
   document.getElementById('score-big').style.color = color;
   document.getElementById('score-label').textContent = scoreLabel(score);
   document.getElementById('score-desc').textContent = scoreDesc(score);
 
+  const statusBadge = document.getElementById('score-status-badge');
+  if (statusBadge) {
+    statusBadge.textContent = scoreLabel(score);
+    statusBadge.style.color = color;
+    statusBadge.style.borderColor = color + '44';
+    statusBadge.style.background = color + '15';
+  }
+
   ['skills','exp','kw','fmt'].forEach((k,i)=>{
     const keys=['skillsScore','experienceScore','keywordsScore','formattingScore'];
     const v=Math.round(r[keys[i]]);
-    document.getElementById('ms-'+k).textContent=v+'%';
-    document.getElementById('ms-'+k).style.color=scoreColor(v);
+    const el = document.getElementById('ms-'+k);
+    if (el) {
+      el.textContent = v + '%';
+      el.style.color = scoreColor(v);
+    }
   });
 
-  const bars=[{l:'Keywords match',v:r.keywordsScore},{l:'Skills alignment',v:r.skillsScore},{l:'Experience fit',v:r.experienceScore},{l:'Resume formatting',v:r.formattingScore}];
-  document.getElementById('bars-container').innerHTML=bars.map(b=>`
+  const bars = [
+    { l: 'Keywords match', v: r.keywordsScore, desc: r.explanations?.keywords },
+    { l: 'Skills alignment', v: r.skillsScore, desc: r.explanations?.skills },
+    { l: 'Experience fit', v: r.experienceScore, desc: r.explanations?.experience },
+    { l: 'Resume formatting', v: r.formattingScore, desc: r.explanations?.formatting }
+  ];
+  document.getElementById('bars-container').innerHTML = bars.map(b => `
     <div class="bar-item">
-      <div class="bar-label"><span>${b.l}</span><span style="font-weight:500;color:${scoreColor(b.v)}">${Math.round(b.v)}%</span></div>
+      <div class="bar-label"><span>${b.l}</span><span style="font-weight:700;color:${scoreColor(b.v)}">${Math.round(b.v)}%</span></div>
       <div class="bar-bg"><div class="bar-fill" style="width:0%;background:${scoreColor(b.v)}" data-w="${Math.round(b.v)}"></div></div>
+      ${b.desc ? `<div class="bar-desc">${escapeHtml(b.desc)}</div>` : ''}
     </div>`).join('');
-  setTimeout(()=>document.querySelectorAll('.bar-fill').forEach(el=>el.style.width=el.dataset.w+'%'),100);
+  setTimeout(() => document.querySelectorAll('.bar-fill').forEach(el => el.style.width = el.dataset.w + '%'), 100);
 
-  document.getElementById('suggestions-container').innerHTML=(r.suggestions||[]).map((s,i)=>`
-    <div class="suggestion-item"><div class="sug-num">${i+1}</div><span>${escapeHtml(s)}</span></div>`).join('');
+  document.getElementById('suggestions-container').innerHTML = (r.suggestions || []).map((s, i) => `
+    <div class="suggestion-item"><div class="sug-num">${i + 1}</div><span>${escapeHtml(s)}</span></div>`).join('');
 
-  document.getElementById('matched-tags').innerHTML=(r.matchedKeywords||[]).map(k=>`<span class="tag tag-match">✓ ${escapeHtml(k)}</span>`).join('');
-  document.getElementById('missing-tags').innerHTML=(r.missingKeywords||[]).map(k=>`<span class="tag tag-miss">✗ ${escapeHtml(k)}</span>`).join('');
-  document.getElementById('ai-summary').textContent=r.summary||'';
+  const matchedList = r.matchedKeywords || [];
+  const missingList = r.missingKeywords || [];
 
-  const el=document.getElementById('results');
-  el.style.display='block';
-  el.scrollIntoView({behavior:'smooth',block:'start'});
+  const matchedCountEl = document.getElementById('matched-count');
+  if (matchedCountEl) matchedCountEl.textContent = `${matchedList.length} matched`;
+
+  const missingCountEl = document.getElementById('missing-count');
+  if (missingCountEl) missingCountEl.textContent = `${missingList.length} gaps`;
+
+  document.getElementById('matched-tags').innerHTML = matchedList.length
+    ? matchedList.map(k => `<span class="tag tag-match">✓ ${escapeHtml(k)}</span>`).join('')
+    : '<span class="empty-state">No overlapping technical keywords identified.</span>';
+
+  document.getElementById('missing-tags').innerHTML = missingList.length
+    ? missingList.map(k => `<span class="tag tag-miss">✗ ${escapeHtml(k)}</span>`).join('')
+    : '<span class="empty-state tag-none">✓ No missing technical keywords found!</span>';
+
+  document.getElementById('ai-summary').textContent = r.summary || '';
+
+  const el = document.getElementById('results');
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 </script>
 </body>

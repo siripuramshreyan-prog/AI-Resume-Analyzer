@@ -162,8 +162,18 @@
       ? Math.max(0, Math.min(100, Math.round((allMatched.length / totalRelevant) * 100)))
       : 0;
 
-    const matchedKeywords = allMatched.slice(0, 12);
-    const missingKeywords = allMissing.slice(0, 10);
+    // Prioritize technical skills in matched and missing keyword displays
+    const prioritizedMatched = [...new Set([
+      ...matchedSkills,
+      ...allMatched
+    ])];
+    const prioritizedMissing = [...new Set([
+      ...missingSkills,
+      ...allMissing
+    ])];
+
+    const matchedKeywords = prioritizedMatched.slice(0, 12);
+    const missingKeywords = prioritizedMissing.slice(0, 10);
 
     const skillsScore = jdSkills.length
       ? Math.max(0, Math.min(100, Math.round((matchedSkills.length / jdSkills.length) * 100)))

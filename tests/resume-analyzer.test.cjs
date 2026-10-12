@@ -189,3 +189,57 @@ test('isExcludedTerm helper correctly filters noise while preserving valid techn
   assert.ok(!analyzer.isExcludedTerm('ci/cd'));
 });
 
+test('UI template has all "Powered by Claude AI" branding removed', () => {
+  assert.ok(!html.includes('Powered by Claude AI'), 'should not contain "Powered by Claude AI"');
+  assert.ok(!html.includes('Claude AI'), 'should not contain any Claude AI branding');
+  assert.ok(html.includes('nav-badge'), 'nav-badge should still exist');
+});
+
+test('UI includes sample data loaders and local file upload support', () => {
+  assert.ok(html.includes('loadSampleResume'), 'UI should include loadSampleResume helper');
+  assert.ok(html.includes('loadSampleJD'), 'UI should include loadSampleJD helper');
+  assert.ok(html.includes('handleFileUpload'), 'UI should support local file reading');
+  assert.ok(html.includes('updateCharCount'), 'UI should include live character counter');
+  assert.ok(html.includes('clearAll'), 'UI should include clearAll function');
+});
+
+test('matched and missing keywords focus primarily on relevant technical skills', () => {
+  const resume = 'Summary: Python developer. Skills: Python, React, SQL, Git. Projects: Built APIs in Python and React. Education: Computer Science. Experience: Developed APIs and tested services. Certifications: AWS.';
+  const jd = 'Seeking a Software Engineer with skills in Python, React, Docker, Kubernetes, and FastAPI. Experience with cloud services and testing automation.';
+  const result = analyzer.analyze(resume, jd);
+
+  // Matched keywords should prioritize technical skills
+  assert.ok(result.matchedKeywords.includes('python'), 'matched keywords should include python');
+  assert.ok(result.matchedKeywords.includes('react'), 'matched keywords should include react');
+  assert.ok(analyzer.SKILL_TERMS.includes(result.matchedKeywords[0]), 'first matched keyword should be a recognized skill term');
+
+  // Missing keywords should prioritize technical skills
+  assert.ok(result.missingKeywords.includes('docker'), 'missing keywords should prioritize docker');
+  assert.ok(result.missingKeywords.includes('kubernetes'), 'missing keywords should prioritize kubernetes');
+  assert.ok(result.missingKeywords.includes('fastapi'), 'missing keywords should prioritize fastapi');
+  assert.ok(analyzer.SKILL_TERMS.includes(result.missingKeywords[0]), 'first missing keyword should be a recognized skill term');
+});
+
+test('scoring accuracy reflects calibrated formula and explanations are fully defined', () => {
+  const resume = 'Summary: Python developer. Skills: Python, React, SQL, Git. Projects: Built web dashboard for 100 users. Education: Computer Science. Experience: Automated testing and deployed code. Certifications: AWS.';
+  const jd = 'Seeking an experienced Python developer with React, Docker, Kubernetes, and AWS skills for cloud platform services.';
+  const result = analyzer.analyze(resume, jd);
+
+  // Test calibrated weighted formula
+  const expectedOverall = Math.max(0, Math.min(100, Math.round(
+    result.skillsScore * 0.35 +
+    result.experienceScore * 0.20 +
+    result.keywordsScore * 0.30 +
+    result.formattingScore * 0.15
+  )));
+  assert.equal(result.overallScore, expectedOverall, 'overallScore should match exact weighted breakdown');
+
+  // Test explanations completeness
+  assert.ok(result.explanations.overall.includes(String(result.overallScore) + '%'));
+  assert.ok(result.explanations.skills.includes(String(result.skillsScore) + '%'));
+  assert.ok(result.explanations.experience.includes(String(result.experienceScore) + '%'));
+  assert.ok(result.explanations.keywords.includes(String(result.keywordsScore) + '%'));
+  assert.ok(result.explanations.formatting.includes(String(result.formattingScore) + '%'));
+});
+
+

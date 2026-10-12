@@ -389,7 +389,7 @@ footer strong{color:var(--text2);font-weight:500}
   <section class="analyzer-section">
     <div class="app-header">
       <h1>✦ Resume analyzer</h1>
-      <p>Paste your resume and a job description to get your AI match score instantly</p>
+      <p>Paste your resume and a job description to get your match score instantly. Analysis runs locally and is not an official ATS score or an AI judgment.</p>
     </div>
 
     <div class="analyzer-grid">
@@ -440,7 +440,10 @@ footer strong{color:var(--text2);font-weight:500}
           </div>
         </div>
       </div>
-      <div class="summary-card"><h3>✦ AI verdict</h3><p id="ai-summary">—</p></div>
+      <div class="summary-card">
+        <h3>✦ AI verdict</h3>
+        <p id="ai-summary">This is a local keyword and resume-structure comparison, not an official ATS score or an AI judgment.</p>
+      </div>
       <div class="results-grid">
         <div class="result-card"><h3>Score breakdown</h3><div id="bars-container"></div></div>
         <div class="result-card"><h3>Top improvements</h3><div id="suggestions-container"></div></div>
@@ -552,7 +555,9 @@ function scoreDesc(n) {
   return 'Significant gaps between your resume and this role. Use the suggestions below.';
 }
 
-const escapeHtml = window.ResumeAnalyzer.escapeHtml;
+const escapeHtml = (value) => (window.ResumeAnalyzer && window.ResumeAnalyzer.escapeHtml)
+  ? window.ResumeAnalyzer.escapeHtml(value)
+  : String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 function analyzeResume() {
   if (!currentUser) { showPage('login'); return; }

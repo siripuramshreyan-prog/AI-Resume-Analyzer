@@ -8,7 +8,9 @@
 
   function extractTerms(text) {
     return [...new Set((String(text).toLowerCase().match(/[a-z][a-z0-9+#.-]{1,}/g) || [])
-      .map(term => term.replace(/^[.+#-]+|[.+#-]+$/g, ''))
+      .map(term => (term === 'c++' || term.startsWith('c++'))
+        ? term.replace(/^[.+#-]+|[.#-]+$/g, '')
+        : term.replace(/^[.+#-]+|[.+#-]+$/g, ''))
       .filter(term => term.length > 2 && !STOP_WORDS.has(term)))];
   }
 
@@ -27,7 +29,7 @@
 
     const resumeLower = resumeText.toLowerCase();
     const jdLower = jdText.toLowerCase();
-    const jdTerms = [...new Set(extractTerms(jdText).filter(term => term.length > 3))];
+    const jdTerms = [...new Set(extractTerms(jdText).filter(term => term.length > 3 || term === 'c++'))];
     const resumeTerms = new Set(extractTerms(resumeText));
     const matchedKeywords = jdTerms.filter(term => resumeTerms.has(term)).slice(0, 12);
     const missingKeywords = jdTerms.filter(term => !resumeTerms.has(term)).slice(0, 10);
